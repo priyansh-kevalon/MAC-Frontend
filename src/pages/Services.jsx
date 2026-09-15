@@ -229,7 +229,7 @@ export default function Services() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-5">
               <a
-                href="mailto:Hey@boostim.com"
+                href="/Contact"
                 className="inline-flex items-center gap-2 rounded-full bg-lime-400 px-7 py-3 text-sm font-semibold text-black transition-all hover:bg-lime-300"
               >
                 Book a Free Consultation <ArrowRight size={16} />

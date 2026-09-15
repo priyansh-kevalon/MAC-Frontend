@@ -2,6 +2,8 @@ import { useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import ctaWomanImg from "../assets/cta-woman.png";
+import homeImage from "../assets/home.jpg";
+
 
 // Media assets matching the Figma UI
 const assets = {
@@ -282,9 +284,9 @@ export default function Home() {
               <div className="relative mx-auto w-full max-w-sm pt-4">
                 <div className="absolute inset-0 translate-x-3 translate-y-3 rotate-2 rounded-2xl bg-[#10B981]" />
                 <img
-                  src={assets.aboutMan}
-                  alt="Young team leader smiling with arms crossed"
-                  className="relative h-64 sm:h-72 w-full rounded-2xl object-cover shadow-sm"
+                src={homeImage}
+                alt="Young team leader smiling with arms crossed"
+                className="relative h-64 sm:h-72 w-full rounded-2xl object-cover shadow-sm"
                 />
               </div>
             </div>

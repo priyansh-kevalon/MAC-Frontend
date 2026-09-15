@@ -194,7 +194,7 @@ export default function ServiceDetail({ service }) {
 
               <div className="mt-8">
                 <a
-                  href="mailto:Hey@boostim.com"
+                  href="/Contact"
                   className="inline-flex items-center gap-2 rounded-full bg-lime-400 px-7 py-3 text-sm font-semibold text-black transition-all hover:bg-lime-300"
                 >
                   Start a Conversation <ArrowRight size={16} />

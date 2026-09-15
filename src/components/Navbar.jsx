@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { ChevronDown, Menu, X, LogOut } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 import logo from "../assets/logo.png";
 
 const navLinks = [
   { name: "Home", to: "/" },
-  { name: "About Us", to: "/about" },
-  {
+   {
     name: "Service",
     to: "/services",
     subItems: [
@@ -20,14 +20,25 @@ const navLinks = [
       { name: "PPC Advertising", to: "/services/ppc-advertising" },
     ],
   },
+  { name: "About Us", to: "/about" },
   { name: "Our Team", to: "/team" },
   { name: "Blog", to: "/blog" },
   { name: "Contact", to: "/contact" },
 ];
 
 export default function Navbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+    setUserMenuOpen(false);
+    navigate("/signin");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#F5F5F3]/95 backdrop-blur-sm">
@@ -115,14 +126,65 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* Desktop "Get started" button */}
-          <div className="hidden lg:flex items-center shrink-0">
-            <Link
-              to="/contact"
-              className="inline-flex items-center justify-center rounded-full border border-black px-6 py-2.5 text-sm font-medium text-black transition-all hover:bg-black hover:text-white"
-            >
-              Get started
-            </Link>
+          {/* Desktop Auth Buttons */}
+          <div className="hidden lg:flex items-center shrink-0 gap-3">
+            {user ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-[#0D0F11] transition-all hover:border-zinc-300 cursor-pointer"
+                >
+                  <div className="grid h-7 w-7 place-items-center rounded-full bg-[#CCFF00] text-xs font-bold text-black">
+                    {(user.name || user.email || "U").charAt(0).toUpperCase()}
+                  </div>
+                  <span className="max-w-[100px] truncate">
+                    {user.name || user.email}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-full pt-2 z-50">
+                    <div className="w-52 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+                      <div className="px-3 py-2 text-xs text-zinc-500">
+                        <p className="font-medium text-[#0D0F11] truncate">
+                          {user.name || "Signed in"}
+                        </p>
+                        <p className="truncate">{user.email}</p>
+                      </div>
+                      <div className="my-1.5 h-px bg-zinc-200" />
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        <LogOut size={14} />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/signin"
+                  className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium text-black transition-all hover:text-zinc-600"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center justify-center rounded-full border border-black px-6 py-2.5 text-sm font-medium text-black transition-all hover:bg-black hover:text-white"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -191,13 +253,50 @@ export default function Navbar() {
                 </a>
               )
             )}
-            <Link
-              to="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="mt-3 inline-block rounded-full border border-black py-2.5 text-center text-sm font-medium text-black hover:bg-black hover:text-white transition-colors"
-            >
-              Get started
-            </Link>
+
+            {/* Mobile Auth */}
+            <div className="mt-3 flex flex-col gap-2">
+              {user ? (
+                <>
+                  <div className="flex items-center gap-2 rounded-xl bg-[#FAFAF8] px-4 py-3">
+                    <div className="grid h-8 w-8 place-items-center rounded-full bg-[#CCFF00] text-xs font-bold text-black">
+                      {(user.name || user.email || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[#0D0F11] truncate">
+                        {user.name || "Signed in"}
+                      </p>
+                      <p className="text-xs text-zinc-500 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-200 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/signin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-full border border-black py-2.5 text-center text-sm font-medium text-black hover:bg-black hover:text-white transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-full bg-black py-2.5 text-center text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
           </nav>
         </div>
       )}
