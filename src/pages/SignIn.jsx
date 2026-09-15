@@ -13,34 +13,39 @@ export default function SignIn() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const email = form.email.trim();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Please provide a valid email address");
+      setLoading(false);
       return;
     }
     if (!form.password) {
       setError("Password is required");
+      setLoading(false);
       return;
     }
 
-    login({
-      email: email,
-      password: "••••••••",
-      loggedInAt: new Date().toISOString(),
-    });
-
-    setSuccess(true);
+    try {
+      await login(email, form.password);
+      setSuccess(true);
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -146,9 +151,10 @@ export default function SignIn() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="mt-1 w-full rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition-all hover:bg-zinc-800"
+                  disabled={loading}
+                  className="mt-1 w-full rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition-all hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Sign In
+                  {loading ? "Signing in..." : "Sign In"}
                 </button>
               </form>
             )}

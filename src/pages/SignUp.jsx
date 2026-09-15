@@ -5,19 +5,21 @@ import { useAuth } from "../context/AuthContext.jsx";
 import logo from "../assets/logo.png";
 
 export default function SignUp() {
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const name = form.name.trim();
     const email = form.email.trim();
@@ -25,29 +27,33 @@ export default function SignUp() {
 
     if (name.length < 2) {
       setError("Name must be at least 2 characters");
+      setLoading(false);
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Please provide a valid email address");
+      setLoading(false);
       return;
     }
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
+      setLoading(false);
       return;
     }
     if (password !== form.confirmPassword) {
       setError("Passwords do not match");
+      setLoading(false);
       return;
     }
 
-    login({
-      name: name,
-      email: email,
-      loggedInAt: new Date().toISOString(),
-    });
-
-    setSuccess(true);
-    setError("");
+    try {
+      await register(name, email, password);
+      setSuccess(true);
+    } catch (err) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -173,9 +179,10 @@ export default function SignUp() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="mt-1 w-full rounded-full bg-black px-8 py-2.5 text-sm font-medium text-white transition-all hover:bg-zinc-800"
+                  disabled={loading}
+                  className="mt-1 w-full rounded-full bg-black px-8 py-2.5 text-sm font-medium text-white transition-all hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Create Account
+                  {loading ? "Creating account..." : "Create Account"}
                 </button>
               </form>
             )}
